@@ -1,6 +1,7 @@
 import telebot
 
 import config
+import db
 
 bot = telebot.TeleBot(config.TELEGRAM_TOKEN)
 
@@ -11,4 +12,6 @@ def repeat_all_messages(message):
 
 
 if __name__ == '__main__':
+    db.init()
+
     bot.polling(none_stop=True)
