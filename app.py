@@ -78,12 +78,13 @@ def echo(message):
     elif current_chat.one_film_rate == 1:
         min_dist = 100000000
         for i in config.MOVIES:
-            dist = utils.distance(i.lower(), message.text)
+            dist = utils.distance(i.lower(), message.text.lower())
             if dist == 0:
                 film_of_one_film_rate = i
                 current_chat.one_film_rate = 2
                 bot.send_message(message.chat.id, 'Поставьте оценку на появившейся клавиатуре',
                                  reply_markup=markups.markup_like_or_not)
+                current_chat.save()
                 return
             else:
                 if dist < min_dist:
