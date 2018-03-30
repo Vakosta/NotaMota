@@ -31,8 +31,11 @@ def start(message):
 
 @bot.message_handler(commands=['rate'])
 def rate_one_film(message):
+    global current_chat
+
     current_chat = Chat.get(Chat.id == message.chat.id)
     current_chat.rate_one_film = 1
+    current_chat.save()
 
     bot.send_message(message.chat.id, 'Введите называние фильма')
 
