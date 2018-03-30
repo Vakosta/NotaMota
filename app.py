@@ -13,6 +13,12 @@ film_of_one_film_rate = None
 min_dist_film = ''
 
 
+def send_film(id):
+    film = MOVIES[current_chat.step]
+    bot.send_message(id, film, reply_markup=markups.markup_like_or_not_or_not_watched)
+    current_chat.current_film = config.MOVIES[current_chat.step]
+
+
 @bot.message_handler(commands=['start'])
 def start(message):
     global current_chat
@@ -25,11 +31,16 @@ def start(message):
 
 
 @bot.message_handler(commands=['rate'])
-def rate_one_film(message):
+def one_film_rate(message):
     global current_chat
 
-    current_chat = Chat.get(Chat.id == message.chat.id)
-    current_chat.rate_one_film = 1
+    try:
+        current_chat = Chat.get(Chat.id == message.chat.id)
+    except Exception:
+        start(message)
+        return
+
+    current_chat.one_film_rate = 1
     current_chat.save()
 
     bot.send_message(message.chat.id, 'Введите называние фильма')
@@ -65,11 +76,7 @@ def echo(message):
             Action.create(chat_id=message.chat.id,
                           film=current_chat.current_film,
                           rating=0)
-
-        film = MOVIES[current_chat.step]
-        bot.send_message(message.chat.id, film, reply_markup=markups.markup_like_or_not_or_not_watched)
-        current_chat.current_film = config.MOVIES[current_chat.step]
-        current_chat.save()
+        send_film(message.chat.id)
     elif current_chat.one_film_rate == 1:
         min_dist = 100000000
         for i in config.MOVIES:
@@ -99,6 +106,8 @@ def echo(message):
             Action.create(chat_id=message.chat.id,
                           film=film_of_one_film_rate,
                           rating=False)
+        current_chat.one_film_rate = 0
+        send_film(message.chat.id)
     elif current_chat.one_film_rate == 3:
         if message.text == 'Да':
             film_of_one_film_rate = min_dist_film
@@ -111,6 +120,7 @@ def echo(message):
             current_chat.one_film_rate = 2
             bot.send_message(message.chat.id, 'Поставьте оценку на появившейся клавиатуре',
                              reply_markup=markups.markup_like_or_not)
+    current_chat.save()
 
 
 if __name__ == '__main__':
