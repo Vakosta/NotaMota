@@ -1,0 +1,3 @@
+from recommendations.recos_sources.topn_algo import TopN
+from recommendations.recos_sources.trash_algo import RandomTrash
+from recommendations.recos_sources.cf_algo import CollaborativeFilter
