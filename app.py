@@ -28,11 +28,17 @@ def echo(message):
     current_chat = Chat.get(Chat.id == message.chat.id)
     if current_chat.rating_stage:
         if message.text == 'Нравится':
-            bot.send_message(message.chat.id, 1)
+            Action.create(chat_id=message.chat.id,
+                          film=config.MOVIES[current_chat.step],
+                          rating=True)
         elif message.text == 'Не нравится':
-            bot.send_message(message.chat.id, 3)
+            Action.create(chat_id=message.chat.id,
+                          film=config.MOVIES[current_chat.step],
+                          rating=None)
         elif message.text == 'Не смотрел':
-            bot.send_message(message.chat.id, 2)
+            Action.create(chat_id=message.chat.id,
+                          film=config.MOVIES[current_chat.step],
+                          rating=False)
 
         current_chat.step += 1
         bot.send_message(message.chat.id, config.MOVIES[current_chat.step], reply_markup=markup)
@@ -40,5 +46,5 @@ def echo(message):
 
 
 if __name__ == '__main__':
-    # init_db() # При первом запуске раскомментировать
+    # init_db()  # При первом запуске раскомментировать
     bot.polling(none_stop=True)

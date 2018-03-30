@@ -19,10 +19,9 @@ class Chat(Model):
 
 
 class Action(Model):
-    id = BigIntegerField()
-    person_id = BigIntegerField()
+    chat_id = BigIntegerField()
     film = TextField()
-    rating = BooleanField()
+    rating = BooleanField(null=True)
 
     class Meta:
         database = db
