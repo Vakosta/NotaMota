@@ -61,21 +61,19 @@ def echo(message):
             Action.create(chat_id=message.chat.id,
                           film=current_chat.current_film,
                           rating=3)
-            current_chat.step += 1
         elif message.text == 'Нейтрально':
             Action.create(chat_id=message.chat.id,
                           film=current_chat.current_film,
                           rating=2)
-            current_chat.step += 1
         elif message.text == 'Не нравится':
             Action.create(chat_id=message.chat.id,
                           film=current_chat.current_film,
                           rating=1)
-            current_chat.step += 1
         elif message.text == 'Не смотрел':
             Action.create(chat_id=message.chat.id,
                           film=current_chat.current_film,
                           rating=0)
+        current_chat.step += 1
         send_film(message.chat.id)
     elif current_chat.one_film_rate == 1:
         min_dist = 100000000
