@@ -43,6 +43,8 @@ def select_film(user):
             return cumsums[i - 1][0]
 
 
+
+
 def send_film(id):
     film = MOVIES[current_chat.step]
     bot.send_message(id, film, reply_markup=markups.markup_like_or_not_or_not_watched)
