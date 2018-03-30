@@ -43,7 +43,7 @@ def one_film_rate(message):
     current_chat.one_film_rate = 1
     current_chat.save()
 
-    bot.send_message(message.chat.id, 'Введите название фильма')
+    bot.send_message(message.chat.id, 'Введите название фильма:')
 
 
 @bot.message_handler(content_types=['text'])
@@ -83,7 +83,7 @@ def echo(message):
             if dist == 0:
                 film_of_one_film_rate = i
                 current_chat.one_film_rate = 2
-                bot.send_message(message.chat.id, 'Поставьте оценку на появившейся клавиатуре',
+                bot.send_message(message.chat.id, 'Оцените фильм.',
                                  reply_markup=markups.markup_like_or_not)
                 current_chat.save()
                 return
