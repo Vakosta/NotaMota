@@ -75,6 +75,7 @@ def echo(message):
                           rating=0)
         current_chat.step += 1
         send_film(message.chat.id)
+        bot.send_message(message.chat.id, 'Голос засчитан')
     elif current_chat.one_film_rate == 1:
         min_dist = 100000000
         for i in config.MOVIES:
