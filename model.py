@@ -1,5 +1,7 @@
 from peewee import *
 
+from config import *
+
 kekdb = SqliteDatabase('data.db')
 db = PostgresqlDatabase('d45im87mi48anp',
                         user='lkejqvtkdsplqj',
@@ -12,11 +14,16 @@ def init_db():
     Chat.create_table()
     Action.create_table()
 
+    Film.create_table()
+    for i in MOVIES:
+        Film.create(name=i)
+
 
 class Chat(Model):
     id = BigIntegerField(primary_key=True)
     rating_stage = BooleanField(default=False)
     step = IntegerField(default=0)
+    rate_one_film = IntegerField(default=0)
 
     class Meta:
         database = db
@@ -26,6 +33,13 @@ class Action(Model):
     chat_id = BigIntegerField()
     film = TextField()
     rating = BooleanField(null=True)
+
+    class Meta:
+        database = db
+
+
+class Film(Model):
+    name = TextField()
 
     class Meta:
         database = db
