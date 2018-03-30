@@ -4,12 +4,15 @@ db = SqliteDatabase('data.db')
 proxy_db = Proxy()
 
 
-def init():
-    Person.create_table()
+def init_db():
+    Chat.create_table()
+    Action.create_table()
 
 
-class Person(Model):
-    id = BigIntegerField()
+class Chat(Model):
+    id = BigIntegerField(primary_key=True)
+    rating_stage = BooleanField(default=False)
+    step = IntegerField(default=0)
 
     class Meta:
         database = db
