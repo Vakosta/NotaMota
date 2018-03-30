@@ -2,6 +2,7 @@ import telebot
 
 import config
 import markups
+import recommendations.candidates as candidates
 import utils
 from model import *
 
@@ -11,6 +12,18 @@ bot = telebot.TeleBot(config.TELEGRAM_TOKEN)
 
 film_of_one_film_rate = None
 min_dist_film = ''
+
+films_for_user = {}
+
+
+def get_actions():
+    actions = list(Action.select().execute())
+
+    result = {}
+    for i in actions:
+        result[(i.chat_id, i.film)] = i.rating
+
+    return result
 
 
 def send_film(id):
@@ -26,7 +39,7 @@ def start(message):
     current_chat = Chat.get_or_create(id=message.chat.id)[0]
 
     bot.send_message(message.chat.id, config.MOVIES[0], reply_markup=markups.markup_like_or_not_or_not_watched)
-    current_chat.current_film = config.MOVIES[0]
+    films_for_user[message.chat.id] = candidates.get_candidates(get_actions(), message.chat.id)
     current_chat.save()
 
 

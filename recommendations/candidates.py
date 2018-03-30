@@ -1,4 +1,5 @@
 import pandas as pd
+
 from recommendations import K_NEAREST_NEIGHBOURS, N_RECS
 from recommendations.recos_sources import TopN, RandomTrash, CollaborativeFilter
 from recommendations.transformer import Normalizer
@@ -14,7 +15,7 @@ def candidates_mixed(topn, trash, cf):
     """
     # normalize weights
     topn = {key: value / sum(topn.values()) for key, value in topn}
-    cf = {key: 3*value / sum(cf.values()) for key, value in cf}
+    cf = {key: 3 * value / sum(cf.values()) for key, value in cf}
     recs = {**topn, **cf}
 
     trash_new = {}
