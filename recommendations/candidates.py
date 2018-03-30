@@ -42,7 +42,7 @@ def get_candidates(data, user):
     for key, value in data.items():
         records.append((key[0], key[1], value))
     df = pd.DataFrame.from_records(records, columns=('user', 'movie', 'rating'))
-    not_watched = set(df['movies'].unique()) - set(df[df['user'] == user]['movies'].unique())
+    not_watched = set(df['movie'].unique()) - set(df[df['user'] == user]['movie'].unique())
 
     # normalize ratings
     transformer = Normalizer('user')
@@ -50,7 +50,8 @@ def get_candidates(data, user):
     df_scaled = transformer.transform(df)
 
     # regularization parameter
-    reg_number = min(df_scaled.groupby('movie').count().mean() / 3, 10)
+    counts = df_scaled.groupby('movie').count()
+    reg_number = min(counts.mean() / 3, 10)
 
     # calculate recs
     topn_recos = TopN(df_scaled, not_watched, N_RECS, reg_number)
