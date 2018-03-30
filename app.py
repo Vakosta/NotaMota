@@ -43,7 +43,7 @@ def one_film_rate(message):
     current_chat.one_film_rate = 1
     current_chat.save()
 
-    bot.send_message(message.chat.id, 'Введите называние фильма')
+    bot.send_message(message.chat.id, 'Введите название фильма')
 
 
 @bot.message_handler(content_types=['text'])
@@ -74,8 +74,8 @@ def echo(message):
                           film=current_chat.current_film,
                           rating=0)
         current_chat.step += 1
-        send_film(message.chat.id)
         bot.send_message(message.chat.id, 'Голос засчитан')
+        send_film(message.chat.id)
     elif current_chat.one_film_rate == 1:
         min_dist = 100000000
         for i in config.MOVIES:
@@ -108,6 +108,7 @@ def echo(message):
                           film=film_of_one_film_rate,
                           rating=False)
         current_chat.one_film_rate = 0
+        bot.send_message(message.chat.id, 'Голос засчитан')
         send_film(message.chat.id)
     elif current_chat.one_film_rate == 3:
         if message.text == 'Да':
