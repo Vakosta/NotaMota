@@ -31,7 +31,7 @@ class Chat(Model):
 class Action(Model):
     chat_id = BigIntegerField()
     film = TextField()
-    rating = BooleanField(null=True)
+    rating = IntegerField()
 
     class Meta:
         database = db

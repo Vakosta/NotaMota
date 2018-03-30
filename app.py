@@ -2,6 +2,7 @@ import telebot
 
 import config
 import markups
+import utils
 from model import *
 
 current_chat = None
@@ -10,26 +11,6 @@ bot = telebot.TeleBot(config.TELEGRAM_TOKEN)
 
 film_of_one_film_rate = None
 min_dist_film = ''
-
-
-def distance(a, b):
-    "Calculates the Levenshtein distance between a and b."
-    n, m = len(a), len(b)
-    if n > m:
-        # Make sure n <= m, to use O(min(n,m)) space
-        a, b = b, a
-        n, m = m, n
-
-    current_row = range(n + 1)  # Keep current and previous row, not entire matrix
-    for i in range(1, m + 1):
-        previous_row, current_row = current_row, [i] + [0] * n
-        for j in range(1, n + 1):
-            add, delete, change = previous_row[j] + 1, current_row[j - 1] + 1, previous_row[j - 1]
-            if a[j - 1] != b[i - 1]:
-                change += 1
-            current_row[j] = min(add, delete, change)
-
-    return current_row[n]
 
 
 @bot.message_handler(commands=['start'])
@@ -66,30 +47,35 @@ def echo(message):
         start(message)
         return
 
-    if message.text == 'Нравится':
-        Action.create(chat_id=message.chat.id,
-                      film=current_chat.current_film,
-                      rating=True)
-        current_chat.step += 1
-    elif message.text == 'Не нравится':
-        Action.create(chat_id=message.chat.id,
-                      film=current_chat.current_film,
-                      rating=None)
-        current_chat.step += 1
-    elif message.text == 'Не смотрел':
-        Action.create(chat_id=message.chat.id,
-                      film=current_chat.current_film,
-                      rating=False)
+    if current_chat.one_film_rate == 0:
+        if message.text == 'Нравится':
+            Action.create(chat_id=message.chat.id,
+                          film=current_chat.current_film,
+                          rating=3)
+            current_chat.step += 1
+        elif message.text == 'Нейтрально':
+            Action.create(chat_id=message.chat.id,
+                          film=current_chat.current_film,
+                          rating=2)
+            current_chat.step += 1
+        elif message.text == 'Не нравится':
+            Action.create(chat_id=message.chat.id,
+                          film=current_chat.current_film,
+                          rating=1)
+            current_chat.step += 1
+        elif message.text == 'Не смотрел':
+            Action.create(chat_id=message.chat.id,
+                          film=current_chat.current_film,
+                          rating=0)
 
         film = MOVIES[current_chat.step]
         bot.send_message(message.chat.id, film, reply_markup=markups.markup_like_or_not_or_not_watched)
         current_chat.current_film = config.MOVIES[current_chat.step]
         current_chat.save()
-
-    if current_chat.one_film_rate == 1:
+    elif current_chat.one_film_rate == 1:
         min_dist = 100000000
         for i in config.MOVIES:
-            dist = distance(i.lower(), message.text)
+            dist = utils.distance(i.lower(), message.text)
             if dist == 0:
                 film_of_one_film_rate = i
                 current_chat.one_film_rate = 2
@@ -130,5 +116,5 @@ def echo(message):
 
 
 if __name__ == '__main__':
-    # init_db()  # При первом запуске раскомментировать
+    init_db()  # При первом запуске раскомментировать
     bot.polling(none_stop=True)
