@@ -7,7 +7,7 @@ DATABASE_DATA = {
     'PORT': '5432',
 }
 
-TELEGRAM_TOKEN = '517628481:AAFxaQ9aqzJiweOQdMMKNRaLJ9Y5OUMKa38'
+TELEGRAM_TOKEN = '554951953:AAGfeYT9jFKmFq94Sz8gTLpyK_QRHilie38'
 
 MOVIES = ['Звёздные войны: последний джедай', 'Рик и Морти', 'Защитники',
           'Пираты Карибского моря', 'Тайна Коко', 'Железный человек',
