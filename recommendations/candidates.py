@@ -50,7 +50,7 @@ def get_candidates(data, user):
     df_scaled = transformer.transform(df)
 
     # regularization parameter
-    counts = df_scaled.groupby('movie').count()
+    counts = df_scaled.groupby('movie')['rating'].count()
     reg_number = min(counts.mean() / 3, 10)
 
     # calculate recs
