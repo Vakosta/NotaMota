@@ -5,6 +5,7 @@ import markups
 import recommendations.candidates as candidates
 import utils
 from model import *
+from random import randint, sample
 
 current_chat = None
 
@@ -21,9 +22,25 @@ def get_actions():
 
     result = {}
     for i in actions:
-        result[(i.chat_id, i.film)] = i.rating
+        if i.rating > 0:
+            result[(i.chat_id, i.film)] = i.rating
 
     return result
+
+
+def select_film(user):
+    global films_for_user
+
+    pairs = sample(films_for_user[user].items())
+
+    cumsums = [0]
+    for movie, rating in pairs:
+        cumsums.append((movie, cumsums[-1] + rating))
+
+    ind = randint(1, cumsums[-1] + 1)
+    for i, movie, cumsum in enumerate(cumsums[1:]):
+        if ind > cumsum:
+            return cumsums[i - 1][0]
 
 
 def send_film(id):
