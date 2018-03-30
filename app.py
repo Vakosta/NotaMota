@@ -17,7 +17,12 @@ bot = telebot.TeleBot(config.TELEGRAM_TOKEN)
 @bot.message_handler(commands=['start'])
 def start(message):
     global current_chat
-    current_chat = Chat.create(id=message.chat.id, rating_stage=True)
+
+    try:
+        current_chat = Chat.create(id=message.chat.id, rating_stage=True)
+    except IntegrityError:
+        Chat.get(Chat.id == message.chat.id).delete_instance()
+        start(message)
 
     bot.send_message(message.chat.id, config.MOVIES[0], reply_markup=markup)
 
@@ -25,7 +30,12 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def echo(message):
     global current_chat
-    current_chat = Chat.get(Chat.id == message.chat.id)
+
+    try:
+        current_chat = Chat.get(Chat.id == message.chat.id)
+    except Exception:
+        start(message)
+
     if current_chat.rating_stage:
         if message.text == 'Нравится':
             Action.create(chat_id=message.chat.id,
@@ -46,5 +56,5 @@ def echo(message):
 
 
 if __name__ == '__main__':
-    init_db()  # При первом запуске раскомментировать
+    # init_db()  # При первом запуске раскомментировать
     bot.polling(none_stop=True)
