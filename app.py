@@ -88,8 +88,9 @@ def echo(message):
                                  reply_markup=markups.markup_like_or_not)
                 return
             else:
-                min_dist = min(min_dist, dist)
-                min_dist_film = i
+                if dist < min_dist:
+                    min_dist = dist
+                    min_dist_film = i
         bot.send_message(message.chat.id, 'Возможно вы имели ввиду ' + min_dist_film + '?',
                          reply_markup=markups.markup_yes_or_no)
         current_chat.one_film_rate = 3
