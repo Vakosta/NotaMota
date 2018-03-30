@@ -17,12 +17,7 @@ min_dist_film = ''
 def start(message):
     global current_chat
 
-    try:
-        current_chat = Chat.create(id=message.chat.id, rating_stage=True)
-    except IntegrityError:
-        Chat.get(Chat.id == message.chat.id).delete_instance()
-        start(message)
-        return
+    current_chat = Chat.get_or_create(id=message.chat.id)[0]
 
     bot.send_message(message.chat.id, config.MOVIES[0], reply_markup=markups.markup_like_or_not_or_not_watched)
     current_chat.current_film = config.MOVIES[0]
@@ -31,8 +26,11 @@ def start(message):
 
 @bot.message_handler(commands=['rate'])
 def rate_one_film(message):
+    global current_chat
+
     current_chat = Chat.get(Chat.id == message.chat.id)
     current_chat.rate_one_film = 1
+    current_chat.save()
 
     bot.send_message(message.chat.id, 'Введите называние фильма')
 
