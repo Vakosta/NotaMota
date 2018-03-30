@@ -130,6 +130,7 @@ def echo(message):
                              reply_markup=markups.markup_like_or_not)
         elif message.text == 'Нет':
             Film.create(name=min_dist_film)
+            film_of_one_film_rate = min_dist_film
             config.MOVIES.append(min_dist_film)
             current_chat.one_film_rate = 2
             bot.send_message(message.chat.id, 'Поставьте оценку на появившейся клавиатуре',
