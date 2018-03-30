@@ -2,12 +2,13 @@ import pandas as pd
 from recommendations import NearestNeighbours
 
 
-def CollaborativeFilter(data, user, n, k, reg):
+def CollaborativeFilter(data, user, movies, n, k, reg):
     """
     Predicts ratings for a user's not rated movies by collaborative filtering
 
     param df: pandas.DataFrame
     param user: str or int, chat id
+    param movies: iterable, list of movies to select recommendations from
     param n: int, number of recommendations to return
     param k: int, number of nearest neighbours to use
     param reg: float, regularization number
@@ -56,6 +57,7 @@ def CollaborativeFilter(data, user, n, k, reg):
             ratings['ii'].append(0)
 
     predictors = pd.DataFrame(ratings)
+    predictors = predictors[predictors['movie'].isin(movies)]
     predictors['rating'] = predictors['uu'] + predictors['ii']
 
     candidates = (

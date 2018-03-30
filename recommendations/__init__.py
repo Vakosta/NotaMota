@@ -1,3 +1,4 @@
 from recommendations.config import antitype, K_NEAREST_NEIGHBOURS, MAX_NEAREST_NEIGHBOURS, N_RECS
 from recommendations.nearest_neighbours import NearestNeighbours
 from recommendations.transformer import Normalizer
+from recommendations.candidates import get_candidates

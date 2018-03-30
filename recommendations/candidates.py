@@ -41,23 +41,20 @@ def get_candidates(data, user):
     for key, value in data.items():
         records.append((key[0], key[1], value))
     df = pd.DataFrame.from_records(records, columns=('user', 'movie', 'rating'))
+    not_watched = set(df['movies'].unique()) - set(df[df['user'] == user]['movies'].unique())
 
     # normalize ratings
     transformer = Normalizer('user')
-    transformer.fit(data)
-    df_scaled = transformer.transform(data)
+    transformer.fit(df)
+    df_scaled = transformer.transform(df)
 
     # regularization parameter
-    reg_number = min(data.groupby('movie').count().mean() / 3, 10)
+    reg_number = min(df_scaled.groupby('movie').count().mean() / 3, 10)
 
-    # calculate recos
-    topn_recos = TopN(df, n=N_RECS, reg=reg_number)
-    trash_recos = RandomTrash(df, n=N_RECS)
-    cf_recos = CollaborativeFilter(df_scaled,
-                                   user,
-                                   n=N_RECS,
-                                   k=K_NEAREST_NEIGHBOURS,
-                                   reg=reg_number)
+    # calculate recs
+    topn_recos = TopN(df_scaled, not_watched, N_RECS, reg_number)
+    trash_recos = RandomTrash(df_scaled, not_watched, N_RECS)
+    cf_recos = CollaborativeFilter(df_scaled, user, not_watched, N_RECS, K_NEAREST_NEIGHBOURS, reg_number)
 
     # mix candidates
     return candidates_mixed(topn=topn_recos, trash=trash_recos, cf=cf_recos)
