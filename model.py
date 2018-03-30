@@ -2,7 +2,6 @@ from peewee import *
 
 from config import *
 
-kekdb = SqliteDatabase('data.db')
 db = PostgresqlDatabase('d45im87mi48anp',
                         user='lkejqvtkdsplqj',
                         password='ab3a4c08c45117ec8f1ca95c273e09e2af9babe51739001e52e474ec4701ac8b',
@@ -21,9 +20,9 @@ def init_db():
 
 class Chat(Model):
     id = BigIntegerField(primary_key=True)
-    rating_stage = BooleanField(default=False)
+    one_film_rate = IntegerField(default=0)
+    current_film = TextField(null=True)
     step = IntegerField(default=0)
-    rate_one_film = IntegerField(default=0)
 
     class Meta:
         database = db

@@ -41,8 +41,11 @@ def start(message):
     except IntegrityError:
         Chat.get(Chat.id == message.chat.id).delete_instance()
         start(message)
+        return
 
     bot.send_message(message.chat.id, config.MOVIES[0], reply_markup=markups.markup_like_or_not_or_not_watched)
+    current_chat.current_film = config.MOVIES[0]
+    current_chat.save()
 
 
 @bot.message_handler(commands=['rate'])
@@ -61,26 +64,29 @@ def echo(message):
         current_chat = Chat.get(Chat.id == message.chat.id)
     except Exception:
         start(message)
+        return
 
-    if current_chat.rating_stage:
-        if message.text == 'Нравится':
-            Action.create(chat_id=message.chat.id,
-                          film=config.MOVIES[current_chat.step],
-                          rating=True)
-        elif message.text == 'Не нравится':
-            Action.create(chat_id=message.chat.id,
-                          film=config.MOVIES[current_chat.step],
-                          rating=None)
-        elif message.text == 'Не смотрел':
-            Action.create(chat_id=message.chat.id,
-                          film=config.MOVIES[current_chat.step],
-                          rating=False)
-
+    if message.text == 'Нравится':
+        Action.create(chat_id=message.chat.id,
+                      film=current_chat.current_film,
+                      rating=True)
         current_chat.step += 1
-        bot.send_message(message.chat.id, config.MOVIES[current_chat.step],
-                         reply_markup=markups.markup_like_or_not_or_not_watched)
+    elif message.text == 'Не нравится':
+        Action.create(chat_id=message.chat.id,
+                      film=current_chat.current_film,
+                      rating=None)
+        current_chat.step += 1
+    elif message.text == 'Не смотрел':
+        Action.create(chat_id=message.chat.id,
+                      film=current_chat.current_film,
+                      rating=False)
+
+        film = MOVIES[current_chat.step]
+        bot.send_message(message.chat.id, film, reply_markup=markups.markup_like_or_not_or_not_watched)
+        current_chat.current_film = config.MOVIES[current_chat.step]
         current_chat.save()
-    elif current_chat.one_film_rate == 1:
+
+    if current_chat.one_film_rate == 1:
         min_dist = 100000000
         for i in config.MOVIES:
             dist = distance(i.lower(), message.text)
