@@ -46,5 +46,5 @@ def echo(message):
 
 
 if __name__ == '__main__':
-    # init_db()  # При первом запуске раскомментировать
+    init_db()  # При первом запуске раскомментировать
     bot.polling(none_stop=True)
