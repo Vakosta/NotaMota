@@ -9,7 +9,7 @@ def RandomTrash(data, movies, n):
     """
     ratings_count = data.groupby("movie").count()
     ratings_count = ratings_count.drop(["user"], axis=1).reset_index()
-    reg_number = ratings_count["rating"].mean() / 2
+    reg_number = ratings_count["rating"].median() / 2
 
     recs = ratings_count[ratings_count['movie'].isin(movies)][ratings_count['rating'] < reg_number]
 

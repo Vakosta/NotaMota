@@ -57,7 +57,7 @@ def send_film(id):
     data = get_actions()
 
     if current_chat.step < 10 or len(data) < 100:
-        film = MOVIES[randint(len(MOVIES))]
+        film = MOVIES[randint(0, len(MOVIES))]
         message = 'Оцените фильм, позязя'
     else:
         if id not in films_for_user.keys() or len(films_for_user[id]) == 1:
