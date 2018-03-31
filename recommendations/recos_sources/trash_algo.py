@@ -7,8 +7,13 @@ def RandomTrash(data, movies, n):
     :param n: int, number of movies to select
     :return: iterable, list of selected movies
     """
-    ratings_count = data[data['movie'].isin(movies)].groupby("movie").count()
-    ratings_count = ratings_count.drop(["user"], axis=1)
+    ratings_count = data.groupby("movie").count()
+    ratings_count = ratings_count.drop(["user"], axis=1).reset_index()
     reg_number = ratings_count["rating"].mean() / 2
 
-    return ratings_count[ratings_count['rating'] < reg_number].sample(n).index
+    recs = ratings_count[ratings_count['movie'].isin(movies)][ratings_count['rating'] < reg_number]
+
+    if len(recs) > 0:
+        return recs.sample(min(len(recs), n))['movie']
+    else:
+        return None

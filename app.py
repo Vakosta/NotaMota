@@ -5,7 +5,7 @@ import markups
 import recommendations.candidates as candidates
 import utils
 from model import *
-from random import randint, sample
+from random import random, sample
 
 current_chat = None
 
@@ -15,6 +15,7 @@ film_of_one_film_rate = None
 min_dist_film = ''
 
 films_for_user = {}
+messages = {}
 
 
 def get_actions():
@@ -31,22 +32,46 @@ def get_actions():
 def select_film(user):
     global films_for_user
 
-    pairs = sample(films_for_user[user].items())
+    pairs = sample(films_for_user[user].items(), k=len(films_for_user[user]))
 
-    cumsums = [0]
+    cumsums = [(None, 0)]
     for movie, rating in pairs:
-        cumsums.append((movie, cumsums[-1] + rating))
+        cumsums.append((movie, cumsums[-1][1] + rating))
 
-    ind = randint(1, cumsums[-1] + 1)
-    for i, movie, cumsum in enumerate(cumsums[1:]):
-        if ind > cumsum:
-            return cumsums[i - 1][0]
+    ind = (cumsums[-1][1] + 1) * random()
+    movie_to_pop = None
+    for i, tup in enumerate(cumsums[1:]):
+        if ind >= tup[1]:
+            movie_to_pop = cumsums[i - 1][0]
+            break
+
+    if movie_to_pop is None:
+        movie_to_pop = cumsums[-1][0]
+        _ = films_for_user[user].pop(movie_to_pop)
+    if movie_to_pop is None:
+        movie_to_pop = """
+        Вы оценили все наши фильмы :)
+        Оцените произвольный фильм с помощью кроманды /rate или подождите, пока это сделает кто-то другой
+        """
+
+    return movie_to_pop
 
 
 def send_film(id):
-    film = MOVIES[current_chat.step]
-    bot.send_message(id, film, reply_markup=markups.markup_like_or_not_or_not_watched)
-    current_chat.current_film = config.MOVIES[current_chat.step]
+    if id not in films_for_user.keys() or len(films_for_user[id]) == 1:
+        films_for_user[id], messages[id] = candidates.get_candidates(get_actions(), id)
+
+    film = select_film(id)
+    if film in messages[id].keys():
+        message = messages[id][film]
+    else:
+        message = ''
+
+    # film = MOVIES[current_chat.step]
+    bot.send_message(id, '\n\n'.join([film, message]), reply_markup=markups.markup_like_or_not_or_not_watched)
+
+    current_chat.current_film = film
+    # config.MOVIES[current_chat.step]
 
 
 @bot.message_handler(commands=['start'])
@@ -55,8 +80,7 @@ def start(message):
 
     current_chat = Chat.get_or_create(id=message.chat.id)[0]
 
-    bot.send_message(message.chat.id, config.MOVIES[0], reply_markup=markups.markup_like_or_not_or_not_watched)
-    films_for_user[message.chat.id] = candidates.get_candidates(get_actions(), message.chat.id)
+    send_film(message.chat.id)
     current_chat.save()
 
 
@@ -126,15 +150,15 @@ def echo(message):
     elif current_chat.one_film_rate == 2:
         if message.text == 'Нравится':
             Action.create(chat_id=message.chat.id,
-                          film=film_of_one_film_rate,
+                          film=current_chat.current_film,
                           rating=True)
         elif message.text == 'Не нравится':
             Action.create(chat_id=message.chat.id,
-                          film=film_of_one_film_rate,
+                          film=current_chat.current_film,
                           rating=None)
         elif message.text == 'Не смотрел':
             Action.create(chat_id=message.chat.id,
-                          film=film_of_one_film_rate,
+                          film=current_chat.current_film,
                           rating=False)
         current_chat.one_film_rate = 0
         bot.send_message(message.chat.id, 'Голос засчитан')
