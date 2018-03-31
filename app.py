@@ -1,5 +1,4 @@
 import telebot
-
 import config
 import markups
 import recommendations.candidates as candidates
@@ -47,27 +46,36 @@ def select_film(user):
 
     if movie_to_pop is None:
         movie_to_pop = cumsums[-1][0]
-        _ = films_for_user[user].pop(movie_to_pop)
-    if movie_to_pop is None:
-        movie_to_pop = """
-        Вы оценили все наши фильмы :)
-        Оцените произвольный фильм с помощью кроманды /rate или подождите, пока это сделает кто-то другой
-        """
+
+        if movie_to_pop is not None:
+            _ = films_for_user[user].pop(movie_to_pop)
 
     return movie_to_pop
 
 
 def send_film(id):
-    if id not in films_for_user.keys() or len(films_for_user[id]) == 1:
-        films_for_user[id], messages[id] = candidates.get_candidates(get_actions(), id)
+    data = get_actions()
 
-    film = select_film(id)
-    if film in messages[id].keys():
-        message = messages[id][film]
+    if current_chat.step < 10 or len(data) < 100:
+        film = MOVIES[current_chat.step]
+        message = 'Оцените фильм, позязя'
     else:
-        message = ''
+        if id not in films_for_user.keys() or len(films_for_user[id]) == 1:
+            films_for_user[id], messages[id] = candidates.get_candidates(get_actions(), id)
 
-    # film = MOVIES[current_chat.step]
+        film = select_film(id)
+        if film is None:
+            return
+            # for movie in MOVIES:
+            #     if (id, movie) in data.keys():
+            #         film = movie
+            #         break
+
+        if film in messages[id].keys():
+            message = messages[id][film]
+        else:
+            message = ''
+
     bot.send_message(id, '\n\n'.join([film, message]), reply_markup=markups.markup_like_or_not_or_not_watched)
 
     current_chat.current_film = film
@@ -106,6 +114,7 @@ def echo(message):
 
     try:
         current_chat = Chat.get(Chat.id == message.chat.id)
+
     except Exception:
         start(message)
         return
