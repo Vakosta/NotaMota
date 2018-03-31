@@ -4,7 +4,7 @@ import markups
 import recommendations.candidates as candidates
 import utils
 from model import *
-from random import random, sample
+from random import randint, random, sample
 
 current_chat = None
 
@@ -53,13 +53,11 @@ def select_film(user):
     return movie_to_pop
 
 
-
-
 def send_film(id):
     data = get_actions()
 
     if current_chat.step < 10 or len(data) < 100:
-        film = MOVIES[current_chat.step]
+        film = MOVIES[randint(len(MOVIES))]
         message = 'Оцените фильм, позязя'
     else:
         if id not in films_for_user.keys() or len(films_for_user[id]) == 1:

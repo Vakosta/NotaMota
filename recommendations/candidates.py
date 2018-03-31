@@ -14,10 +14,10 @@ def candidates_mixed(topn, cf, trash=None):
     :return: dict, {movie: rating}, all recommendations combined together
     """
     # normalize weights
-    topn = {key: value / (10+sum(topn.values())) for key, value in topn.items()}
+    topn = {key: value / (1+sum(topn.values())) for key, value in topn.items()}
     topn_message = {key: 'Этот фильм очень популярен' for key in topn.keys()}
-    cf = {key: 3 * value / (10+sum(cf.values())) for key, value in cf.items()}
-    cf_message = {key: 'Вам скорее понравится этот фильм' for key in cf.keys()}
+    cf = {key:  2*value / (1+sum(cf.values())) for key, value in cf.items()}
+    cf_message = {key: 'Возможно, тебе понравится этот фильм' for key in cf.keys()}
     recs = {**topn, **cf}
     messages = {**topn_message, **cf_message}
 
@@ -27,8 +27,8 @@ def candidates_mixed(topn, cf, trash=None):
             if movie not in recs.keys():
                 # trash takes
                 trash_new[movie] = 1
-        trash_new = {key: value / (10+sum(trash_new.values())) for key, value in trash_new.items()}
-        trash_message = {key: 'А вдруг' for key in trash_new.keys()}
+        trash_new = {key: 2*value / (1+sum(trash_new.values())) for key, value in trash_new.items()}
+        trash_message = {key: 'А вдруг...' for key in trash_new.keys()}
         recs = {**trash_new, **recs}
         messages = {**trash_message, **messages}
 
