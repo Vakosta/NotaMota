@@ -1,3 +1,5 @@
+TELEGRAM_TOKEN = '554951953:AAGfeYT9jFKmFq94Sz8gTLpyK_QRHilie38'
+
 DATABASE_DATA = {
     'ENGINE': 'django.db.backends.postgresql_psycopg2',
     'NAME': 'd55juqn67jac81',
@@ -6,8 +8,6 @@ DATABASE_DATA = {
     'HOST': 'ec2-54-75-227-92.eu-west-1.compute.amazonaws.com',
     'PORT': '5432',
 }
-
-TELEGRAM_TOKEN = '554951953:AAGfeYT9jFKmFq94Sz8gTLpyK_QRHilie38'
 
 MOVIES = ['Звёздные войны: последний джедай', 'Рик и Морти', 'Защитники',
           'Пираты Карибского моря', 'Тайна Коко', 'Железный человек',
